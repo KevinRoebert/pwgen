@@ -21,28 +21,25 @@
         </vs-col>
       </vs-row>
       <vs-row>
-        <vs-col offset="4" w="3">
-          <vs-button
-            icon
-            flat
-            color="rgb(59,222,200)"
-            class="generate"
-            @click="generate()"
-          >
-            <i class="bx bx-refresh" />
-            Generate
-          </vs-button>
-        </vs-col>
-      </vs-row>
-      <vs-row>
-        <vs-col offset="2" w="3">
+        <vs-col offset="4" w="4">
           <div class="config">
             <div class="con-switch">
+              <vs-button
+                icon
+                flat
+                color="rgb(59,222,200)"
+                class="generate"
+                @click="generate()"
+              >
+                <i class="bx bx-refresh" />
+                Generate
+              </vs-button>
               <vs-input
+                id="length"
                 v-model="config.length"
                 type="number"
-                label="Length"
                 class="switch"
+                label="Length"
               />
               <vs-switch v-model="config.lowercase" class="switch" color="rgb(0, 196, 141)">
                 Lowercase
@@ -70,7 +67,7 @@ export default {
   data: () => ({
     password: '',
     config: {
-      length: 25,
+      length: 59,
       lowercase: true,
       uppercase: true,
       number: true,
@@ -79,12 +76,12 @@ export default {
   }),
   watch: {
     password (val) {
-      const minLen = 25
+      const minLen = 29
 
       if (val.length < minLen) {
         this.openNotification('top-right', 'danger', '<i class="bx bx-error-circle" />', 'Insecure Password', 'Your chosen password is insecure. Consider to increase the length of your password.')
       } else {
-        const bitLen = new Blob([this.password]).size * 8
+        const bitLen = Math.floor(new Blob([this.password]).size / 6 * 40)// * 8 * 5 / 6 => size without separators
         this.openNotification('top-right', 'success', '<i class="bx bx-rocket" />', 'Secure Password', 'Congratulations, your chosen password is secure and ' + bitLen + 'bit strong.')
       }
     }
@@ -102,7 +99,8 @@ export default {
       const number = '23456789'
 
       this.password = '' // reset old password
-      const array = new Uint32Array(this.config.length)
+      const len = this.config.length % 6 === 0 ? this.config.length + 1 : this.config.length
+      const array = new Uint32Array(Math.ceil(5 * len / 6))
       window.crypto.getRandomValues(array)
 
       let pool = ''
@@ -140,7 +138,7 @@ export default {
         pw += pool.charAt(array[i] % pool.length)
       }
 
-      this.password = pw
+      this.password = pw.substring(0, this.config.length)
     },
     openNotification (position = null, color, icon, title, text) {
       this.$vs.notification({
@@ -164,6 +162,19 @@ export default {
   }
 }
 </script>
+
+<style>
+[id*="--length"] {
+  width: 100%;
+  min-width: 48px;
+  padding: 5px 5px 5px 10px;
+  justify-content: center;
+  border-radius: 20px;
+  border: 0;
+  position: relative;
+  margin-top: 4px;
+}
+</style>
 
 <style scoped>
 
@@ -194,6 +205,8 @@ export default {
 .generate {
   font-weight: bold;
   font-size: larger;
+  width: 100%;
+  margin-bottom: 50px;
 }
 
 .config {
