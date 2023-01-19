@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "boxicons": "^2.1.4",
-    "core-js": "^3.26.0",
+    "core-js": "^3.27.2",
     "nuxt": "^2.15.8",
     "v-clipboard": "^2.2.3",
     "vuesax": "^4.0.1-alpha.25",
